@@ -42,7 +42,12 @@
         tabindex="-1"
         @click.self="onClickContainer"
       >
-        <div class="vfm__content" :class="[contentClass, { 'vfm--prevent-auto': preventClick }]" :style="contentStyle">
+        <div
+          ref="vfmContent"
+          class="vfm__content"
+          :class="[contentClass, { 'vfm--prevent-auto': preventClick }]"
+          :style="[dragPosition, contentStyle]"
+        >
           <slot v-bind:params="params" />
         </div>
       </div>
@@ -52,6 +57,7 @@
 
 <script>
 import FocusTrap from './utils/focusTrap.js'
+import { getPosition, validElement, getNumberInRange, trimPixel, getBounding } from './utils/drag.js'
 import { disableBodyScroll, enableBodyScroll } from './utils/bodyScrollLock'
 
 const TransitionState = {
@@ -97,7 +103,11 @@ export default {
     zIndexBase: { type: [String, Number], default: 1000 },
     zIndex: { type: [Boolean, String, Number], default: false },
     focusRetain: { type: Boolean, default: true },
-    focusTrap: { type: Boolean, default: false }
+    focusTrap: { type: Boolean, default: false },
+    drag: { type: Boolean, default: false },
+    fitParent: { type: Boolean, default: true },
+    dragSelector: { type: [Boolean, String], default: false },
+    keepDragPosition: { type: Boolean, default: false }
   },
   data: () => ({
     modalStackIndex: null,
@@ -109,7 +119,8 @@ export default {
     overlayTransitionState: null,
     modalTransitionState: null,
     stopEvent: false,
-    params: {}
+    params: {},
+    dragPosition: {}
   }),
   computed: {
     api() {
@@ -218,6 +229,8 @@ export default {
               }
             })
 
+          this.drag && this.bindDrag()
+
           this.visible = true
           this.$nextTick(() => {
             this.startTransitionEnter()
@@ -241,6 +254,7 @@ export default {
         }
         !$_vm.hideOverlay && ($_vm.visibility.overlay = true)
       }
+      this.drag && this.unbindDrag()
       this.startTransitionLeave()
     },
     startTransitionEnter() {
@@ -317,6 +331,9 @@ export default {
       this.modalTransitionState = TransitionState.Leave
       this.modalStackIndex = null
       this.lockScroll && enableBodyScroll(this.$refs.vfmContainer)
+      if (!this.keepDragPosition) {
+        this.dragPosition = {}
+      }
 
       let stopEvent = false
       const event = this.createModalEvent({
@@ -366,6 +383,60 @@ export default {
         this.params = params
       }
       this.$emit('input', value)
+    },
+    startDrag(e) {
+      const $vfmContent = this.$refs.vfmContent
+      if (!this.drag || !validElement(e, $vfmContent, this.dragSelector)) {
+        return
+      }
+      e.stopPropagation()
+      const down = getPosition(e)
+      const bounding = getBounding($vfmContent, this.fitParent ? this.$refs.vfmContainer : null)
+      const _top = trimPixel($vfmContent.style.top)
+      const _left = trimPixel($vfmContent.style.left)
+      const moving = e => {
+        e.stopPropagation()
+        const move = getPosition(e)
+        let top = _top + move.y - down.y
+        let left = _left + move.x - down.x
+        if (bounding) {
+          top = getNumberInRange(top, bounding.minTop, bounding.maxTop)
+          left = getNumberInRange(left, bounding.minLeft, bounding.maxLeft)
+        }
+        this.dragPosition = {
+          bottom: 'unset',
+          top: top + 'px',
+          right: 'unset',
+          left: left + 'px',
+          position: 'relative',
+          touchAction: 'none'
+        }
+      }
+
+      const end = () => {
+        document.removeEventListener('mousemove', moving)
+        document.removeEventListener('mouseup', end)
+
+        document.removeEventListener('touchmove', moving)
+        document.removeEventListener('touchend', end)
+      }
+
+      document.addEventListener('mousemove', moving)
+      document.addEventListener('mouseup', end)
+
+      document.addEventListener('touchmove', moving)
+      document.addEventListener('touchend', end)
+    },
+    bindDrag() {
+      const $vfmContent = this.$refs.vfmContent
+      $vfmContent.addEventListener('mousedown', this.startDrag)
+      $vfmContent.addEventListener('touchstart', this.startDrag, { passive: false })
+      this.dragPosition.touchAction = 'none'
+    },
+    unbindDrag() {
+      const $vfmContent = this.$refs.vfmContent
+      $vfmContent.removeEventListener('mousedown', this.startDrag)
+      $vfmContent.removeEventListener('touchstart', this.startDrag)
     }
   }
 }

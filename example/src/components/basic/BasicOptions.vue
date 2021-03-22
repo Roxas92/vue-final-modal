@@ -16,6 +16,10 @@
       :attach="attach ? '#attach' : false"
       :focus-retain="focusRetain"
       :focus-trap="focusTrap"
+      :drag="drag"
+      :fit-parent="fitParent"
+      :drag-selector="dragSelector"
+      :keep-drag-position="keepDragPosition"
       @confirm="showModal = false"
       @cancel="showModal = false"
     >
@@ -108,6 +112,18 @@
         <span>focusTrap:</span>
         <input v-model="focusTrap" type="checkbox" />
       </label>
+      <label class="flex items-center space-x-2">
+        <span>drag:</span>
+        <input v-model="drag" type="checkbox" />
+      </label>
+      <label class="flex items-center space-x-2">
+        <span>fitParent:</span>
+        <input v-model="fitParent" type="checkbox" />
+      </label>
+      <label class="flex items-center space-x-2">
+        <span>keepDragPosition:</span>
+        <input v-model="keepDragPosition" type="checkbox" />
+      </label>
       <button class="vfm-btn" @click="reset">reset</button>
     </div>
     <h4>Attach area:</h4>
@@ -144,7 +160,10 @@ const initData = () => ({
   zIndex: 0,
   attach: false,
   focusRetain: true,
-  focusTrap: false
+  focusTrap: false,
+  drag: false,
+  fitParent: true,
+  keepDragPosition: false
 })
 
 export default {
