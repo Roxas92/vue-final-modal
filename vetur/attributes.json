@@ -82,5 +82,21 @@
   "vue-final-modal/focus-trap": {
     "type": "boolean",
     "description": "Enables focus trap meaning that only inputs/buttons that are withing the modal window can be focused by pressing Tab (plugin uses very naive implementation of the focus trap)."
+  },
+  "vue-final-modal/drag": {
+    "type": "boolean",
+    "description": "Enables draggable modal"
+  },
+  "vue-final-modal/fit-parent": {
+    "type": "boolean",
+    "description": "Respect .vfm__container's size on drag"
+  },
+  "vue-final-modal/drag-selector": {
+    "type": "boolean|string",
+    "description": "Only the selected element that was selected by querySelectorAll(string) can trigger drag modal"
+  },
+  "vue-final-modal/keep-drag-position": {
+    "type": "boolean",
+    "description": "Keep drag position style after modal closed"
   }
 }

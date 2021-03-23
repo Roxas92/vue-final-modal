@@ -84,8 +84,8 @@ Style that will be applied to the modal container.
 
 ## `contentStyle`
 
-- Type: `[String, Object, Array]`
-- Default: `''`
+- Type: `[Object, Array]`
+- Default: `{}`
 
 Style that will be applied to the modal content.
 
@@ -265,3 +265,31 @@ Focus the modal `vfm__container` after the modal enter.
 - Default: `false`
 
 Enables focus trap meaning that only inputs/buttons that are withing the modal window can be focused by pressing Tab (plugin uses very naive implementation of the focus trap).
+
+## `drag`
+
+- Type: `Boolean`
+- Default: `false`
+
+Enables draggable modal.
+
+## `fitParent`
+
+- Type: `Boolean`
+- Default: `false`
+
+Respect `.vfm__container`'s size on drag.
+
+## `dragSelector`
+
+- Type: `[Boolean, String]`
+- Default: `false`
+
+Only the selected element that was selected by `querySelectorAll(string)` can trigger drag modal.
+
+## `keepDragPosition`
+
+- Type: `Boolean`
+- Default: `false`
+
+Keep drag position style after modal closed.
