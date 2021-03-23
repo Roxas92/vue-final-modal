@@ -18,7 +18,6 @@
       :focus-trap="focusTrap"
       :drag="drag"
       :fit-parent="fitParent"
-      :drag-selector="dragSelector"
       :keep-drag-position="keepDragPosition"
       @confirm="showModal = false"
       @cancel="showModal = false"
