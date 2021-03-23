@@ -46,7 +46,7 @@
           ref="vfmContent"
           class="vfm__content"
           :class="[contentClass, { 'vfm--prevent-auto': preventClick }]"
-          :style="[dragPosition, contentStyle]"
+          :style="bindContentStyle"
         >
           <slot v-bind:params="params" />
         </div>
@@ -90,7 +90,7 @@ export default {
     contentClass: STYLE_PROP,
     styles: STYLE_PROP,
     overlayStyle: STYLE_PROP,
-    contentStyle: STYLE_PROP,
+    contentStyle: { type: [Object, Array], default: () => ({}) },
     lockScroll: { type: Boolean, default: true },
     hideOverlay: { type: Boolean, default: false },
     clickToClose: { type: Boolean, default: true },
@@ -148,6 +148,14 @@ export default {
         ...(this.calculateZIndex !== false && { zIndex: this.calculateZIndex })
       }
     },
+    bindContentStyle() {
+      let style = []
+      if (this.drag) {
+        style.push(this.dragPosition)
+      }
+      Array.isArray(this.contentStyle) ? style.push(...this.contentStyle) : style.push(this.contentStyle)
+      return style
+    },
     computedTransition() {
       if (typeof this.transition === 'string') return { name: this.transition }
       return { ...this.transition }
@@ -181,6 +189,15 @@ export default {
     isComponentReadyToBeDestroyed(isReady) {
       if (isReady) {
         this.visible = false
+      }
+    },
+    drag(value) {
+      if (this.visible) {
+        if (value) {
+          this.bindDrag()
+        } else {
+          this.unbindDrag()
+        }
       }
     }
   },
