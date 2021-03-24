@@ -218,6 +218,29 @@ describe('VueFinalModal.vue', () => {
       expect(wrapper.attributes('style')).toContain(zIndexStyle)
       wrapper.unmount()
     })
+    it('transition is string', async () => {
+      const transition = 'vfm-test-transition'
+      const { wrapper, $vfm } = await createClosedModal({
+        transition
+      })
+
+      expect(wrapper.findComponent('.vfm').vm.computedTransition).toEqual({ name: transition })
+    })
+    it('transition is an object', async () => {
+      const transition = {
+        'enter-active-class': 'transition duration-200 ease-in-out transform',
+        'enter-class': 'translate-y-full',
+        'enter-to-class': 'translate-y-0',
+        'leave-active-class': 'transition duration-200 ease-in-out transform',
+        'leave-to-class': 'translate-y-full',
+        'leave-class': 'translate-y-0'
+      }
+      const { wrapper, $vfm } = await createClosedModal({
+        transition
+      })
+
+      expect(wrapper.findComponent('.vfm').vm.computedTransition).toEqual(transition)
+    })
   })
 
   describe('API', () => {

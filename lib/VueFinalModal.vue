@@ -9,7 +9,7 @@
     @keydown="onEsc"
   >
     <transition
-      :name="overlayTransition"
+      v-bind="computedOverlayTransition"
       @before-enter="beforeOverlayEnter"
       @after-enter="afterOverlayEnter"
       @before-leave="beforeOverlayLeave"
@@ -23,7 +23,7 @@
       ></div>
     </transition>
     <transition
-      :name="transition"
+      v-bind="computedTransition"
       @before-enter="beforeModalEnter"
       @after-enter="afterModalEnter"
       @before-leave="beforeModalLeave"
@@ -88,8 +88,8 @@ export default {
         return val.nodeType === Node.ELEMENT_NODE
       }
     },
-    transition: { type: String, default: 'vfm' },
-    overlayTransition: { type: String, default: 'vfm' },
+    transition: { type: [String, Object], default: 'vfm' },
+    overlayTransition: { type: [String, Object], default: 'vfm' },
     zIndexAuto: { type: Boolean, default: true },
     zIndexBase: { type: [String, Number], default: 1000 },
     zIndex: { type: [Boolean, String, Number], default: false },
@@ -142,6 +142,22 @@ export default {
           zIndex: calculateZIndex.value
         })
       }
+    })
+
+    const computedTransition = computed(() => {
+      if (typeof props.transition === 'string') {
+        return { name: props.transition }
+      }
+
+      return props.transition
+    })
+
+    const computedOverlayTransition = computed(() => {
+      if (typeof props.overlayTransition === 'string') {
+        return { name: props.overlayTransition }
+      }
+
+      return props.overlayTransition
     })
 
     watch(
@@ -403,6 +419,8 @@ export default {
       params,
       calculateZIndex,
       bindStyle,
+      computedTransition,
+      computedOverlayTransition,
       beforeOverlayEnter,
       afterOverlayEnter,
       beforeOverlayLeave,
